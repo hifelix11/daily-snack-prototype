@@ -1,0 +1,164 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useUserId } from "../providers";
+import {
+  getNextQuestion,
+  canPlayToday,
+  fetchAllData,
+  submitAnswer,
+} from "@/lib/progress";
+import { trackEvent } from "@/lib/posthog";
+import CardPicker from "@/components/CardPicker";
+import QuestionView from "@/components/QuestionView";
+import ResultView from "@/components/ResultView";
+import type { Question, UserProgressRow } from "@/lib/progress";
+
+type Phase = "loading" | "pick" | "question" | "result" | "gate" | "done";
+
+export default function PlayPage() {
+  const userId = useUserId();
+  const router = useRouter();
+  const [phase, setPhase] = useState<Phase>("loading");
+  const [question, setQuestion] = useState<Question | null>(null);
+  const [chosenIdx, setChosenIdx] = useState<number>(0);
+  const [correct, setCorrect] = useState<boolean>(false);
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const [allProgress, setAllProgress] = useState<UserProgressRow[]>([]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    (async () => {
+      const { questions, progress } = await fetchAllData(userId);
+      setAllQuestions(questions);
+      setAllProgress(progress);
+
+      if (!canPlayToday(progress)) {
+        trackEvent("daily_gate_hit");
+        setPhase("gate");
+        return;
+      }
+
+      const next = await getNextQuestion(userId);
+      if (!next) {
+        trackEvent("all_questions_completed");
+        setPhase("done");
+        return;
+      }
+
+      setQuestion(next);
+      setPhase("pick");
+    })();
+  }, [userId]);
+
+  const handleCardPick = () => {
+    if (question) {
+      trackEvent("question_viewed", {
+        question_id: question.id,
+        stage: question.stage,
+      });
+    }
+    setPhase("question");
+  };
+
+  const handleAnswer = async (idx: number, isCorrect: boolean) => {
+    if (!userId || !question) return;
+
+    setChosenIdx(idx);
+    setCorrect(isCorrect);
+
+    await submitAnswer(userId, question.id, idx, isCorrect);
+
+    // Check if stage just completed
+    const stageQuestions = allQuestions.filter(
+      (q) => q.stage === question.stage
+    );
+    const answeredInStage = allProgress.filter((p) =>
+      stageQuestions.some((sq) => sq.id === p.question_id)
+    ).length;
+    // +1 for the question just answered
+    if (answeredInStage + 1 >= stageQuestions.length) {
+      trackEvent("stage_completed", { stage: question.stage });
+    }
+
+    // Check if all questions done
+    if (allProgress.length + 1 >= allQuestions.length) {
+      trackEvent("all_questions_completed");
+    }
+
+    setPhase("result");
+  };
+
+  const handleGoHome = () => {
+    router.push("/");
+  };
+
+  if (phase === "loading") {
+    return (
+      <main className="flex-1 flex items-center justify-center p-8">
+        <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  if (phase === "gate") {
+    return (
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-md mx-auto gap-6">
+        <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-200">
+          <p className="text-lg font-semibold text-gray-700 mb-1">
+            Come back tomorrow!
+          </p>
+          <p className="text-sm text-gray-500">
+            You&apos;ve already answered today&apos;s question.
+          </p>
+        </div>
+        <button
+          onClick={handleGoHome}
+          className="px-6 py-3 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors"
+        >
+          Back to Home
+        </button>
+      </main>
+    );
+  }
+
+  if (phase === "done") {
+    return (
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-md mx-auto gap-6">
+        <div className="bg-emerald-50 rounded-2xl p-6 text-center border border-emerald-200">
+          <p className="text-lg font-semibold text-emerald-700 mb-1">
+            You&apos;re done!
+          </p>
+          <p className="text-sm text-emerald-600">
+            Thanks for testing! You answered all 20 questions.
+          </p>
+        </div>
+        <button
+          onClick={handleGoHome}
+          className="px-6 py-3 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors"
+        >
+          Back to Home
+        </button>
+      </main>
+    );
+  }
+
+  return (
+    <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+      {phase === "pick" && <CardPicker onPick={handleCardPick} />}
+      {phase === "question" && question && (
+        <QuestionView question={question} onAnswer={handleAnswer} />
+      )}
+      {phase === "result" && question && (
+        <ResultView
+          question={question}
+          chosenIdx={chosenIdx}
+          correct={correct}
+          onGoHome={handleGoHome}
+        />
+      )}
+    </main>
+  );
+}
