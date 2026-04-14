@@ -120,8 +120,9 @@ function SignInScreen() {
           Daily Snack
         </h1>
         <p className="text-sm text-gray-500 text-center mb-6">
-          Einfach mit deiner LaVita E-Mail-Adresse anmelden, um auf allen
-          Geräten den gleichen Fortschritt zu sehen.
+          Am besten mit einer privaten E-Mail-Adresse anmelden — so bleibt dein
+          Fortschritt auf allen Geräten erhalten. LaVita-Adressen werden aktuell
+          noch blockiert, der Support arbeitet an einer Lösung.
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
