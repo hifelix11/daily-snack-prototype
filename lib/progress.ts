@@ -6,6 +6,7 @@ export interface Question {
   id: string;
   stage: number;
   order_in_stage: number;
+  title: string | null;
   prompt: string;
   options: string[];
   correct_idx: number;
@@ -21,7 +22,7 @@ export interface UserProgressRow {
   answered_at: string;
 }
 
-const STAGE_SIZES: Record<number, number> = { 1: 3, 2: 5, 3: 8, 4: 4 };
+const STAGE_SIZES: Record<number, number> = { 1: 6, 2: 9, 3: 12, 4: 3 };
 
 export function getStageUnlocks(progress: UserProgressRow[], allQuestions: Question[]) {
   const stages = [1, 2, 3, 4];
@@ -97,16 +98,65 @@ export async function getNextQuestion(
   return null;
 }
 
+export const COOLDOWN_MS = 20 * 60 * 60 * 1000;
+
+function lastAnswerTime(progress: UserProgressRow[]): number | null {
+  if (progress.length === 0) return null;
+  return progress.reduce((latest, p) => {
+    const t = new Date(p.answered_at).getTime();
+    return t > latest ? t : latest;
+  }, 0);
+}
+
 export function canPlayToday(progress: UserProgressRow[]): boolean {
-  if (progress.length === 0) return true;
+  const last = lastAnswerTime(progress);
+  if (last === null) return true;
+  return Date.now() - last >= COOLDOWN_MS;
+}
 
-  const today = new Date().toDateString();
-  const lastAnswer = progress.reduce((latest, p) => {
-    const d = new Date(p.answered_at);
-    return d > latest ? d : latest;
-  }, new Date(0));
+export function msUntilNextQuestion(progress: UserProgressRow[]): number {
+  const last = lastAnswerTime(progress);
+  if (last === null) return 0;
+  return Math.max(0, COOLDOWN_MS - (Date.now() - last));
+}
 
-  return lastAnswer.toDateString() !== today;
+export function formatNextAvailableLabel(progress: UserProgressRow[]): string {
+  const ms = msUntilNextQuestion(progress);
+  if (ms <= 0) return "";
+
+  const ONE_HOUR = 60 * 60 * 1000;
+  if (ms < ONE_HOUR) {
+    const minutes = Math.ceil(ms / (60 * 1000));
+    return `in ${minutes} ${minutes === 1 ? "Minute" : "Minuten"}`;
+  }
+
+  const last = lastAnswerTime(progress)!;
+  const next = new Date(last + COOLDOWN_MS);
+  const hour = next.getHours();
+
+  // Awkward-to-show absolute times at night: fall back to relative hours.
+  if (hour >= 22 || hour < 6) {
+    const hours = Math.floor(ms / ONE_HOUR);
+    return `in ${hours} ${hours === 1 ? "Stunde" : "Stunden"}`;
+  }
+
+  const now = new Date();
+  const startOfDay = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const dayDiff = Math.round(
+    (startOfDay(next) - startOfDay(now)) / (24 * 60 * 60 * 1000)
+  );
+
+  const hh = String(hour).padStart(2, "0");
+  const mm = String(next.getMinutes()).padStart(2, "0");
+  const time = `${hh}:${mm}`;
+
+  let day: string;
+  if (dayDiff <= 0) day = "heute";
+  else if (dayDiff === 1) day = "morgen";
+  else day = `in ${dayDiff} Tagen`;
+
+  return `${day} um ${time} Uhr`;
 }
 
 export async function fetchAllData(userId: string) {

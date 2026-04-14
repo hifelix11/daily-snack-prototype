@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserId } from "./providers";
-import { fetchAllData, canPlayToday, getStageUnlocks } from "@/lib/progress";
+import {
+  fetchAllData,
+  canPlayToday,
+  getStageUnlocks,
+  formatNextAvailableLabel,
+} from "@/lib/progress";
 import { trackEvent } from "@/lib/posthog";
 import StageProgress from "@/components/StageProgress";
 import HistoryGrid from "@/components/HistoryGrid";
@@ -15,8 +20,8 @@ export default function HomePage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [progress, setProgress] = useState<UserProgressRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [canPlay, setCanPlay] = useState(false);
   const [allDone, setAllDone] = useState(false);
+  const [, setNowTick] = useState(0);
 
   useEffect(() => {
     if (!userId) return;
@@ -24,11 +29,18 @@ export default function HomePage() {
     fetchAllData(userId).then(({ questions: q, progress: p }) => {
       setQuestions(q);
       setProgress(p);
-      setCanPlay(canPlayToday(p));
       setAllDone(p.length >= q.length);
       setLoading(false);
     });
   }, [userId]);
+
+  useEffect(() => {
+    const id = setInterval(() => setNowTick((n) => n + 1), 30 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const canPlay = canPlayToday(progress);
+  const nextLabel = formatNextAvailableLabel(progress);
 
   const handlePlay = () => {
     if (!canPlay) {
@@ -80,11 +92,8 @@ export default function HomePage() {
         </button>
       ) : (
         <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-200 w-full">
-          <p className="text-lg font-semibold text-gray-700 mb-1">
-            Bis morgen!
-          </p>
-          <p className="text-sm text-gray-500">
-            Sie haben die heutige Frage bereits beantwortet. Bis zum nächsten Mal!
+          <p className="text-lg font-semibold text-gray-700">
+            Nächste Frage {nextLabel}
           </p>
         </div>
       )}

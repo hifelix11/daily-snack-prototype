@@ -7,6 +7,7 @@ create table questions (
   options jsonb not null,
   correct_idx int not null,
   explanation text not null,
+  title text not null,
   created_at timestamptz default now(),
   unique (stage, order_in_stage)
 );

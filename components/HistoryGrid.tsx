@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { getStageName } from "@/lib/stages";
+import { getStageUnlocks } from "@/lib/progress";
 import type { Question, UserProgressRow } from "@/lib/progress";
 
 interface HistoryGridProps {
@@ -14,10 +15,17 @@ export default function HistoryGrid({ questions, progress }: HistoryGridProps) {
   const [selectedQ, setSelectedQ] = useState<Question | null>(null);
 
   const progressMap = new Map(progress.map((p) => [p.question_id, p]));
+  const unlockedStages = new Set(
+    getStageUnlocks(progress, questions)
+      .filter((s) => s.unlocked)
+      .map((s) => s.stage)
+  );
 
-  const answeredQuestions = questions.filter((q) => progressMap.has(q.id));
+  const sortedQuestions = [...questions].sort(
+    (a, b) => a.stage - b.stage || a.order_in_stage - b.order_in_stage
+  );
 
-  if (answeredQuestions.length === 0) return null;
+  if (sortedQuestions.length === 0) return null;
 
   const selectedProgress = selectedQ
     ? progressMap.get(selectedQ.id)
@@ -29,19 +37,50 @@ export default function HistoryGrid({ questions, progress }: HistoryGridProps) {
         Verlauf
       </h3>
 
-      <div className="grid grid-cols-5 gap-2">
-        {answeredQuestions.map((q) => {
+      <div className="grid grid-cols-4 gap-2">
+        {sortedQuestions.map((q) => {
+          const p = progressMap.get(q.id);
+          const locked = !unlockedStages.has(q.stage) && !p;
+          const answered = !!p;
+
           return (
             <button
               key={q.id}
-              onClick={() => setSelectedQ(selectedQ?.id === q.id ? null : q)}
+              onClick={() => answered && setSelectedQ(selectedQ?.id === q.id ? null : q)}
+              disabled={!answered}
               className={cn(
-                "aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-medium transition-all border-2 bg-blue-50 border-[#1d3557]/30 text-[#1d3557]",
+                "aspect-square rounded-xl flex flex-col items-center justify-center gap-1 p-2 text-xs font-medium transition-all border-2",
+                answered && "bg-emerald-100 border-emerald-400 text-emerald-700",
+                !answered && !locked &&
+                  "bg-white border-gray-200 text-gray-500",
+                locked && "bg-gray-100 border-gray-200 text-gray-300",
                 selectedQ?.id === q.id && "ring-2 ring-[#1d3557] ring-offset-2"
               )}
             >
-              <span className="text-[10px] text-gray-400">S{q.stage}</span>
-              <span>✓</span>
+              {locked ? (
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              ) : (
+                <>
+                  <span className="text-[11px] leading-tight text-center line-clamp-2">
+                    {q.title ?? "—"}
+                  </span>
+                  <span className="text-lg leading-none">
+                    {answered && "✓"}
+                  </span>
+                </>
+              )}
             </button>
           );
         })}

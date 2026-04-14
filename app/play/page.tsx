@@ -8,6 +8,7 @@ import {
   canPlayToday,
   fetchAllData,
   submitAnswer,
+  formatNextAvailableLabel,
 } from "@/lib/progress";
 import { trackEvent } from "@/lib/posthog";
 import CardPicker from "@/components/CardPicker";
@@ -25,6 +26,12 @@ export default function PlayPage() {
   const [correct, setCorrect] = useState<boolean>(false);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [allProgress, setAllProgress] = useState<UserProgressRow[]>([]);
+  const [, setNowTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setNowTick((n) => n + 1), 30 * 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -102,14 +109,12 @@ export default function PlayPage() {
   }
 
   if (phase === "gate") {
+    const nextLabel = formatNextAvailableLabel(allProgress);
     return (
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-md mx-auto gap-6">
         <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-200">
-          <p className="text-lg font-semibold text-gray-700 mb-1">
-            Bis morgen!
-          </p>
-          <p className="text-sm text-gray-500">
-            Sie haben die heutige Frage bereits beantwortet.
+          <p className="text-lg font-semibold text-gray-700">
+            Nächste Frage {nextLabel}
           </p>
         </div>
         <button
