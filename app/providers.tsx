@@ -87,7 +87,7 @@ function SignInScreen() {
           <p className="text-sm text-gray-600 leading-relaxed">
             Wir haben einen Anmeldelink an{" "}
             <span className="font-medium text-[#1d3557]">{email}</span> gesendet.
-            Klicken Sie auf den Link, um fortzufahren — auf diesem oder einem
+            Klick auf den Link, um fortzufahren — auf diesem oder einem
             anderen Gerät.
           </p>
           <button
@@ -111,7 +111,8 @@ function SignInScreen() {
           Daily Snack
         </h1>
         <p className="text-sm text-gray-500 text-center mb-6">
-          Melden Sie sich per E-Mail an — so bleibt Ihr Fortschritt erhalten.
+          Einfach mit deiner LaVita E-Mail-Adresse anmelden, um auf allen
+          Geräten den gleichen Fortschritt zu sehen.
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input

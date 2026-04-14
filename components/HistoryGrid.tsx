@@ -52,12 +52,12 @@ export default function HistoryGrid({ questions, progress }: HistoryGridProps) {
     }
     if (locked) {
       setToast(
-        `Noch gesperrt — schließen Sie zuerst „${getStageName(q.stage - 1)}" ab.`
+        `Noch gesperrt — schließ zuerst „${getStageName(q.stage - 1)}" ab.`
       );
       return;
     }
     if (canPlayToday(progress)) {
-      setToast('Tippen Sie auf „Heutige Frage", um weiterzumachen.');
+      setToast('Tipp auf „Heutige Frage", um weiterzumachen.');
     } else {
       setToast(`Nächste Frage ${formatNextAvailableLabel(progress)}`);
     }

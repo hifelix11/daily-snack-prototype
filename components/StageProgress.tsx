@@ -19,7 +19,7 @@ export default function StageProgress({ stages }: StageProgressProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
       <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-        Ihr Fortschritt
+        Dein Fortschritt
       </h3>
       {stages.map((s) => {
         const pct = s.total > 0 ? (s.answered / s.total) * 100 : 0;

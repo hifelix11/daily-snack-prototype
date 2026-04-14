@@ -83,7 +83,7 @@ export default function HomePage() {
             Geschafft!
           </p>
           <p className="text-sm text-emerald-600">
-            Danke fürs Testen! Sie haben alle 30 Fragen beantwortet.
+            Danke fürs Testen! Du hast alle 30 Fragen beantwortet.
           </p>
         </div>
       ) : canPlay ? (

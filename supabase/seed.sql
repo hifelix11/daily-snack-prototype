@@ -45,8 +45,8 @@ insert into questions (stage, order_in_stage, title, prompt, options, correct_id
 -- Stage 2: Küchen-Code (9)
 insert into questions (stage, order_in_stage, title, prompt, options, correct_idx, explanation) values
 (2, 1, 'Salat + Fett',
- 'Was passiert, wenn Sie Salat mit fettfreiem Dressing essen?',
- '["Sie nehmen alle Vitamine normal auf — Hauptsache Salat", "Sie nehmen etwa die Hälfte der schützenden Pflanzenstoffe auf", "Die für Augen, Haut und Immunsystem wichtigsten Stoffe landen fast gar nicht in Ihrem Körper"]',
+ 'Was passiert, wenn du Salat mit fettfreiem Dressing isst?',
+ '["Du nimmst alle Vitamine normal auf — Hauptsache Salat", "Du nimmst etwa die Hälfte der schützenden Pflanzenstoffe auf", "Die für Augen, Haut und Immunsystem wichtigsten Stoffe landen fast gar nicht in deinem Körper"]',
  2,
  'Tomaten, Karotten und grünes Blattgemüse enthalten fettlösliche Pflanzenstoffe, die die Augen vor Makuladegeneration schützen, die Haut vor UV-Schäden bewahren und das Immunsystem stärken — Beta-Carotin, Lycopin, Lutein. Ohne Fett im Dressing können diese Stoffe die Darmwand nicht passieren und werden wieder ausgeschieden. Schon 1 EL Olivenöl reicht, um sie voll aufzunehmen. Das fettfreie Dressing aus dem Bioladen ist ernährungsphysiologisch also eine verpasste Chance.'),
 (2, 2, 'Lycopin',
@@ -60,10 +60,10 @@ insert into questions (stage, order_in_stage, title, prompt, options, correct_id
  2,
  'Beta-Carotin ist die Vorstufe von Vitamin A — wichtig für Nachtsicht, Hautregeneration und Immunabwehr. In rohen Möhren ist es hinter stabilen Zellwänden eingesperrt: Der Körper nimmt nur 11 % auf. Kochen bricht die Zellwände auf — aus gekochten Möhren kommen 75 % an. Schon 1 TL Olivenöl reicht, um die Aufnahme noch weiter zu steigern. Der Möhrensticks-Snack beim Meeting? Vitaminmäßig fast eine Nullnummer. Besser: kurz dünsten und mit etwas Öl servieren.'),
 (2, 4, 'Spinat + Calcium',
- 'Spinat enthält fast so viel Calcium wie Milch. Wie viel davon kommt tatsächlich in Ihren Knochen an?',
+ 'Spinat enthält fast so viel Calcium wie Milch. Wie viel davon kommt tatsächlich in deinen Knochen an?',
  '["Etwa so viel wie aus Milch (27 %)", "Etwa die Hälfte (15 %)", "Nur etwa 5 % — der Rest wird ungenutzt ausgeschieden"]',
  2,
- 'Calcium ist unverzichtbar für starke Knochen und Zähne — aber nur, wenn der Körper es auch aufnehmen kann. Spinat enthält Oxalsäure, die Calcium im Darm so fest bindet, dass es unverdaut wieder ausgeschieden wird. Von den 99 mg Calcium in 100 g Spinat nimmt der Körper nur 5 % auf. Um so viel Calcium wie aus einem Glas Milch zu bekommen, müssten Sie 1,6 kg Spinat essen. Besser: Grünkohl, Brokkoli, Pak Choi — bei ihnen sind es bis zu 40 %. Der „grüne Smoothie mit Spinat" für starke Knochen ist also eher Wunschdenken.'),
+ 'Calcium ist unverzichtbar für starke Knochen und Zähne — aber nur, wenn der Körper es auch aufnehmen kann. Spinat enthält Oxalsäure, die Calcium im Darm so fest bindet, dass es unverdaut wieder ausgeschieden wird. Von den 99 mg Calcium in 100 g Spinat nimmt der Körper nur 5 % auf. Um so viel Calcium wie aus einem Glas Milch zu bekommen, müsstest du 1,6 kg Spinat essen. Besser: Grünkohl, Brokkoli, Pak Choi — bei ihnen sind es bis zu 40 %. Der „grüne Smoothie mit Spinat" für starke Knochen ist also eher Wunschdenken.'),
 (2, 5, 'Kurkuma',
  'Kurkuma enthält einen entzündungshemmenden Wirkstoff, der gegen Gelenkschmerzen und zur Herzgesundheit eingesetzt wird. Wie viel davon kommt ohne schwarzen Pfeffer im Blut an?',
  '["Etwa die Hälfte", "Etwa ein Fünftel", "Praktisch nichts — der Körper baut ihn in Minuten ab"]',
