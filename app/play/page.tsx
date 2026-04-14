@@ -11,12 +11,11 @@ import {
   formatNextAvailableLabel,
 } from "@/lib/progress";
 import { trackEvent } from "@/lib/posthog";
-import CardPicker from "@/components/CardPicker";
 import QuestionView from "@/components/QuestionView";
 import ResultView from "@/components/ResultView";
 import type { Question, UserProgressRow } from "@/lib/progress";
 
-type Phase = "loading" | "pick" | "question" | "result" | "gate" | "done";
+type Phase = "loading" | "question" | "result" | "gate" | "done";
 
 export default function PlayPage() {
   const userId = useUserId();
@@ -54,20 +53,14 @@ export default function PlayPage() {
         return;
       }
 
+      trackEvent("question_viewed", {
+        question_id: next.id,
+        stage: next.stage,
+      });
       setQuestion(next);
-      setPhase("pick");
+      setPhase("question");
     })();
   }, [userId]);
-
-  const handleCardPick = () => {
-    if (question) {
-      trackEvent("question_viewed", {
-        question_id: question.id,
-        stage: question.stage,
-      });
-    }
-    setPhase("question");
-  };
 
   const handleAnswer = async (idx: number, isCorrect: boolean) => {
     if (!userId || !question) return;
@@ -150,7 +143,6 @@ export default function PlayPage() {
 
   return (
     <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-      {phase === "pick" && <CardPicker onPick={handleCardPick} />}
       {phase === "question" && question && (
         <QuestionView question={question} onAnswer={handleAnswer} />
       )}
