@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { cn } from "@/lib/cn";
 import { trackEvent } from "@/lib/posthog";
+import { getStageName } from "@/lib/stages";
 import type { Question } from "@/lib/progress";
 
 interface QuestionViewProps {
@@ -37,7 +38,7 @@ export default function QuestionView({ question, onAnswer }: QuestionViewProps) 
     <div className="flex flex-col gap-6 w-full max-w-md mx-auto">
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
         <p className="text-sm text-amber-600 font-medium mb-2">
-          Stage {question.stage} &middot; Question {question.order_in_stage}
+          {getStageName(question.stage)} &middot; Question {question.order_in_stage}
         </p>
         <h2 className="text-lg font-semibold text-gray-800 leading-snug">
           {question.prompt}

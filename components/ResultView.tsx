@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { trackEvent } from "@/lib/posthog";
+import { getStageName } from "@/lib/stages";
 import type { Question } from "@/lib/progress";
 
 interface ResultViewProps {
@@ -43,7 +44,7 @@ export default function ResultView({
       {/* Question + answer recap */}
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
         <p className="text-sm text-amber-600 font-medium mb-2">
-          Stage {question.stage} &middot; Question {question.order_in_stage}
+          {getStageName(question.stage)} &middot; Question {question.order_in_stage}
         </p>
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
           {question.prompt}

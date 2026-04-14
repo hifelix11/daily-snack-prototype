@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { getStageName } from "@/lib/stages";
 
 interface StageInfo {
   stage: number;
@@ -24,7 +25,7 @@ export default function StageProgress({ stages }: StageProgressProps) {
         const pct = s.total > 0 ? (s.answered / s.total) * 100 : 0;
         return (
           <div key={s.stage} className="flex items-center gap-3">
-            <div className="flex items-center gap-2 w-20 shrink-0">
+            <div className="flex items-center gap-2 w-40 shrink-0">
               {!s.unlocked ? (
                 <svg
                   className="w-4 h-4 text-gray-400"
@@ -56,11 +57,11 @@ export default function StageProgress({ stages }: StageProgressProps) {
               ) : null}
               <span
                 className={cn(
-                  "text-sm font-medium",
+                  "text-sm font-medium truncate",
                   s.unlocked ? "text-gray-700" : "text-gray-400"
                 )}
               >
-                Stage {s.stage}
+                {getStageName(s.stage)}
               </span>
             </div>
 
