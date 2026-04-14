@@ -2,11 +2,16 @@
 
 import { useEffect, useState, createContext, useContext } from "react";
 import {
-  getCurrentUserId,
+  getCurrentUser,
   onAuthChange,
   signInWithMagicLink,
 } from "@/lib/supabase";
-import { initPostHog, identifyUser, trackEvent } from "@/lib/posthog";
+import {
+  initPostHog,
+  identifyUser,
+  resetUser,
+  trackEvent,
+} from "@/lib/posthog";
 
 const AuthContext = createContext<string | null>(null);
 
@@ -22,16 +27,20 @@ export function Providers({ children }: { children: React.ReactNode }) {
     initPostHog();
     trackEvent("app_opened");
 
-    getCurrentUserId()
-      .then((id) => {
-        setUserId(id);
-        if (id) identifyUser(id);
+    getCurrentUser()
+      .then((user) => {
+        setUserId(user?.id ?? null);
+        if (user) identifyUser(user.id, { email: user.email });
       })
       .finally(() => setLoading(false));
 
-    const unsubscribe = onAuthChange((id) => {
-      setUserId(id);
-      if (id) identifyUser(id);
+    const unsubscribe = onAuthChange((user) => {
+      // Detect sign-out: previously had a user, now null → reset PostHog.
+      setUserId((prev) => {
+        if (prev && !user) resetUser();
+        return user?.id ?? null;
+      });
+      if (user) identifyUser(user.id, { email: user.email });
     });
 
     return unsubscribe;

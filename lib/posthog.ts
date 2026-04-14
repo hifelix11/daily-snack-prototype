@@ -25,9 +25,14 @@ export function initPostHog() {
   initialized = true;
 }
 
-export function identifyUser(userId: string) {
+export function identifyUser(userId: string, properties?: object) {
   if (typeof window === "undefined") return;
-  posthog.identify(userId);
+  posthog.identify(userId, properties as Record<string, unknown>);
+}
+
+export function resetUser() {
+  if (typeof window === "undefined") return;
+  posthog.reset();
 }
 
 export function trackEvent(

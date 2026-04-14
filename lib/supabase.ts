@@ -30,11 +30,17 @@ export const supabase = new Proxy({} as SupabaseClient, {
   },
 });
 
-export async function getCurrentUserId(): Promise<string | null> {
+export interface AuthUser {
+  id: string;
+  email: string | null;
+}
+
+export async function getCurrentUser(): Promise<AuthUser | null> {
   const {
     data: { session },
   } = await getSupabase().auth.getSession();
-  return session?.user?.id ?? null;
+  if (!session?.user) return null;
+  return { id: session.user.id, email: session.user.email ?? null };
 }
 
 export async function signInWithMagicLink(email: string): Promise<void> {
@@ -54,12 +60,16 @@ export async function signOut(): Promise<void> {
 }
 
 export function onAuthChange(
-  callback: (userId: string | null) => void
+  callback: (user: AuthUser | null) => void
 ): () => void {
   const {
     data: { subscription },
   } = getSupabase().auth.onAuthStateChange((_event, session) => {
-    callback(session?.user?.id ?? null);
+    if (!session?.user) {
+      callback(null);
+      return;
+    }
+    callback({ id: session.user.id, email: session.user.email ?? null });
   });
   return () => subscription.unsubscribe();
 }
