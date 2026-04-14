@@ -8,8 +8,10 @@ import {
   canPlayToday,
   getStageUnlocks,
   formatNextAvailableLabel,
+  getRetentionStats,
 } from "@/lib/progress";
-import { trackEvent } from "@/lib/posthog";
+import { trackEvent, setUserProperties } from "@/lib/posthog";
+import { signOut } from "@/lib/supabase";
 import StageProgress from "@/components/StageProgress";
 import HistoryGrid from "@/components/HistoryGrid";
 import type { Question, UserProgressRow } from "@/lib/progress";
@@ -31,6 +33,7 @@ export default function HomePage() {
       setProgress(p);
       setAllDone(p.length >= q.length);
       setLoading(false);
+      setUserProperties(getRetentionStats(p, q));
     });
   }, [userId]);
 
@@ -100,6 +103,13 @@ export default function HomePage() {
 
       {/* History */}
       <HistoryGrid questions={questions} progress={progress} />
+
+      <button
+        onClick={() => signOut()}
+        className="text-xs text-gray-400 hover:text-gray-600 mt-4"
+      >
+        Abmelden
+      </button>
     </main>
   );
 }

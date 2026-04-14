@@ -114,6 +114,63 @@ export function canPlayToday(progress: UserProgressRow[]): boolean {
   return Date.now() - last >= COOLDOWN_MS;
 }
 
+export interface RetentionStats {
+  answered_total: number;
+  current_stage: number;
+  days_since_first_answer: number;
+  streak_days: number;
+}
+
+export function getRetentionStats(
+  progress: UserProgressRow[],
+  questions: Question[]
+): RetentionStats {
+  const answered_total = progress.length;
+
+  const stageUnlocks = getStageUnlocks(progress, questions);
+  const firstIncomplete = stageUnlocks.find((s) => !s.complete);
+  const current_stage = firstIncomplete ? firstIncomplete.stage : 4;
+
+  let days_since_first_answer = 0;
+  if (progress.length > 0) {
+    const first = progress.reduce((earliest, p) => {
+      const t = new Date(p.answered_at).getTime();
+      return t < earliest ? t : earliest;
+    }, Number.POSITIVE_INFINITY);
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    days_since_first_answer = Math.floor((Date.now() - first) / DAY_MS);
+  }
+
+  const streak_days = computeStreakDays(progress);
+
+  return { answered_total, current_stage, days_since_first_answer, streak_days };
+}
+
+function computeStreakDays(progress: UserProgressRow[]): number {
+  if (progress.length === 0) return 0;
+  const answeredDays = new Set(
+    progress.map((p) => new Date(p.answered_at).toDateString())
+  );
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  // Streak counts backwards from today (or yesterday if they haven't played today yet).
+  let cursor: Date;
+  if (answeredDays.has(today.toDateString())) cursor = today;
+  else if (answeredDays.has(yesterday.toDateString())) cursor = yesterday;
+  else return 0;
+
+  let streak = 0;
+  while (answeredDays.has(cursor.toDateString())) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
 export function msUntilNextQuestion(progress: UserProgressRow[]): number {
   const last = lastAnswerTime(progress);
   if (last === null) return 0;

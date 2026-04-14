@@ -23,6 +23,7 @@ export default function QuestionView({ question, onAnswer }: QuestionViewProps) 
 
     trackEvent("answer_submitted", {
       question_id: question.id,
+      title: question.title,
       stage: question.stage,
       correct,
       chosen_idx: idx,

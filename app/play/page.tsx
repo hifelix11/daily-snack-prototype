@@ -9,8 +9,9 @@ import {
   fetchAllData,
   submitAnswer,
   formatNextAvailableLabel,
+  getRetentionStats,
 } from "@/lib/progress";
-import { trackEvent } from "@/lib/posthog";
+import { trackEvent, setUserProperties } from "@/lib/posthog";
 import QuestionView from "@/components/QuestionView";
 import ResultView from "@/components/ResultView";
 import type { Question, UserProgressRow } from "@/lib/progress";
@@ -39,6 +40,7 @@ export default function PlayPage() {
       const { questions, progress } = await fetchAllData(userId);
       setAllQuestions(questions);
       setAllProgress(progress);
+      setUserProperties(getRetentionStats(progress, questions));
 
       if (!canPlayToday(progress)) {
         trackEvent("daily_gate_hit");
@@ -68,6 +70,20 @@ export default function PlayPage() {
     setCorrect(isCorrect);
 
     await submitAnswer(userId, question.id, idx, isCorrect);
+
+    // Refresh user properties so retention cohorts see the latest engagement.
+    const updatedProgress = [
+      ...allProgress,
+      {
+        id: "pending",
+        user_id: userId,
+        question_id: question.id,
+        chosen_idx: idx,
+        correct: isCorrect,
+        answered_at: new Date().toISOString(),
+      },
+    ];
+    setUserProperties(getRetentionStats(updatedProgress, allQuestions));
 
     // Check if stage just completed
     const stageQuestions = allQuestions.filter(

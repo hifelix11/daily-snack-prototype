@@ -37,3 +37,8 @@ export function trackEvent(
   if (typeof window === "undefined") return;
   posthog.capture(event, properties);
 }
+
+export function setUserProperties(properties: object) {
+  if (typeof window === "undefined") return;
+  posthog.setPersonProperties(properties as Record<string, unknown>);
+}

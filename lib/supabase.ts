@@ -30,17 +30,36 @@ export const supabase = new Proxy({} as SupabaseClient, {
   },
 });
 
-export async function ensureAnonAuth(): Promise<string> {
-  const client = getSupabase();
+export async function getCurrentUserId(): Promise<string | null> {
   const {
     data: { session },
-  } = await client.auth.getSession();
+  } = await getSupabase().auth.getSession();
+  return session?.user?.id ?? null;
+}
 
-  if (session?.user) {
-    return session.user.id;
-  }
-
-  const { data, error } = await client.auth.signInAnonymously();
+export async function signInWithMagicLink(email: string): Promise<void> {
+  const { error } = await getSupabase().auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo:
+        typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
+    },
+  });
   if (error) throw error;
-  return data.user!.id;
+}
+
+export async function signOut(): Promise<void> {
+  const { error } = await getSupabase().auth.signOut();
+  if (error) throw error;
+}
+
+export function onAuthChange(
+  callback: (userId: string | null) => void
+): () => void {
+  const {
+    data: { subscription },
+  } = getSupabase().auth.onAuthStateChange((_event, session) => {
+    callback(session?.user?.id ?? null);
+  });
+  return () => subscription.unsubscribe();
 }
