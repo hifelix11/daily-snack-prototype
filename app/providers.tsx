@@ -25,7 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       })
       .catch((err) => {
         console.error("Auth error:", err);
-        setError("Failed to initialize. Please refresh.");
+        setError("Fehler beim Initialisieren. Bitte neu laden.");
       });
   }, []);
 
@@ -41,8 +41,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Loading...</p>
+          <div className="w-8 h-8 border-4 border-[#1d3557] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-gray-500">Wird geladen…</p>
         </div>
       </div>
     );

@@ -41,7 +41,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#1d3557] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -54,7 +54,7 @@ export default function HomePage() {
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-800">Daily Snack</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Learn something new every day
+          Jeden Tag etwas Neues lernen
         </p>
       </div>
 
@@ -65,27 +65,26 @@ export default function HomePage() {
       {allDone ? (
         <div className="bg-emerald-50 rounded-2xl p-6 text-center border border-emerald-200 w-full">
           <p className="text-lg font-semibold text-emerald-700 mb-1">
-            You&apos;re done!
+            Geschafft!
           </p>
           <p className="text-sm text-emerald-600">
-            Thanks for testing! You answered all 20 questions.
+            Danke fürs Testen! Sie haben alle 30 Fragen beantwortet.
           </p>
         </div>
       ) : canPlay ? (
         <button
           onClick={handlePlay}
-          className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold text-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+          className="w-full py-4 rounded-xl bg-[#1d3557] hover:bg-[#2a4a7a] text-white font-semibold text-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
         >
-          Today&apos;s Question
+          Heutige Frage
         </button>
       ) : (
         <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-200 w-full">
           <p className="text-lg font-semibold text-gray-700 mb-1">
-            Come back tomorrow!
+            Bis morgen!
           </p>
           <p className="text-sm text-gray-500">
-            You&apos;ve already answered today&apos;s question. See you next
-            time!
+            Sie haben die heutige Frage bereits beantwortet. Bis zum nächsten Mal!
           </p>
         </div>
       )}

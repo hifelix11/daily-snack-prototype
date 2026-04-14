@@ -37,8 +37,8 @@ export default function QuestionView({ question, onAnswer }: QuestionViewProps) 
   return (
     <div className="flex flex-col gap-6 w-full max-w-md mx-auto">
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-        <p className="text-sm text-amber-600 font-medium mb-2">
-          {getStageName(question.stage)} &middot; Question {question.order_in_stage}
+        <p className="text-sm text-[#1d3557] font-medium mb-2">
+          {getStageName(question.stage)} &middot; Frage {question.order_in_stage}
         </p>
         <h2 className="text-lg font-semibold text-gray-800 leading-snug">
           {question.prompt}
@@ -53,7 +53,7 @@ export default function QuestionView({ question, onAnswer }: QuestionViewProps) 
             className={cn(
               "w-full text-left px-5 py-4 rounded-xl border-2 transition-all duration-200 font-medium",
               selected === null &&
-                "border-gray-200 bg-white hover:border-amber-400 hover:bg-amber-50 active:scale-[0.98]",
+                "border-gray-200 bg-white hover:border-[#1d3557] hover:bg-blue-50 active:scale-[0.98]",
               selected === idx &&
                 idx === question.correct_idx &&
                 "border-emerald-500 bg-emerald-50 text-emerald-700",

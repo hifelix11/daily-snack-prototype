@@ -24,7 +24,7 @@ export default function CardPicker({ onPick }: CardPickerProps) {
   return (
     <div className="flex flex-col items-center gap-8">
       <h2 className="text-xl font-semibold text-gray-700">
-        Pick a card to reveal today&apos;s question
+        Wählen Sie eine Karte für die heutige Frage
       </h2>
       <div className="flex gap-4">
         {[0, 1, 2].map((idx) => (
@@ -43,7 +43,7 @@ export default function CardPicker({ onPick }: CardPickerProps) {
               )}
             >
               {/* Front (face-down) */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg flex items-center justify-center [backface-visibility:hidden] border-2 border-amber-300">
+              <div className="absolute inset-0 rounded-xl bg-[#1d3557] shadow-lg flex items-center justify-center [backface-visibility:hidden] border-2 border-[#2a4a7a]">
                 <span className="text-3xl text-white font-bold">?</span>
               </div>
               {/* Back (face-up) */}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { getStageName } from "@/lib/stages";
 import type { Question, UserProgressRow } from "@/lib/progress";
 
 interface HistoryGridProps {
@@ -25,26 +26,22 @@ export default function HistoryGrid({ questions, progress }: HistoryGridProps) {
   return (
     <div className="w-full">
       <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-        History
+        Verlauf
       </h3>
 
       <div className="grid grid-cols-5 gap-2">
         {answeredQuestions.map((q) => {
-          const p = progressMap.get(q.id)!;
           return (
             <button
               key={q.id}
               onClick={() => setSelectedQ(selectedQ?.id === q.id ? null : q)}
               className={cn(
-                "aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-medium transition-all border-2",
-                p.correct
-                  ? "bg-emerald-50 border-emerald-300 text-emerald-700"
-                  : "bg-red-50 border-red-300 text-red-600",
-                selectedQ?.id === q.id && "ring-2 ring-amber-400 ring-offset-2"
+                "aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-medium transition-all border-2 bg-blue-50 border-[#1d3557]/30 text-[#1d3557]",
+                selectedQ?.id === q.id && "ring-2 ring-[#1d3557] ring-offset-2"
               )}
             >
               <span className="text-[10px] text-gray-400">S{q.stage}</span>
-              <span>{p.correct ? "✓" : "✗"}</span>
+              <span>✓</span>
             </button>
           );
         })}
@@ -54,8 +51,8 @@ export default function HistoryGrid({ questions, progress }: HistoryGridProps) {
       {selectedQ && selectedProgress && (
         <div className="mt-4 bg-white rounded-2xl shadow-md p-5 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-amber-600 font-medium">
-              Stage {selectedQ.stage} &middot; Q{selectedQ.order_in_stage}
+            <p className="text-sm text-[#1d3557] font-medium">
+              {getStageName(selectedQ.stage)} &middot; Frage {selectedQ.order_in_stage}
             </p>
             <button
               onClick={() => setSelectedQ(null)}

@@ -22,7 +22,6 @@ export default function PlayPage() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("loading");
   const [question, setQuestion] = useState<Question | null>(null);
-  const [chosenIdx, setChosenIdx] = useState<number>(0);
   const [correct, setCorrect] = useState<boolean>(false);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [allProgress, setAllProgress] = useState<UserProgressRow[]>([]);
@@ -66,7 +65,6 @@ export default function PlayPage() {
   const handleAnswer = async (idx: number, isCorrect: boolean) => {
     if (!userId || !question) return;
 
-    setChosenIdx(idx);
     setCorrect(isCorrect);
 
     await submitAnswer(userId, question.id, idx, isCorrect);
@@ -98,7 +96,7 @@ export default function PlayPage() {
   if (phase === "loading") {
     return (
       <main className="flex-1 flex items-center justify-center p-8">
-        <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#1d3557] border-t-transparent rounded-full animate-spin" />
       </main>
     );
   }
@@ -108,17 +106,17 @@ export default function PlayPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-md mx-auto gap-6">
         <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-200">
           <p className="text-lg font-semibold text-gray-700 mb-1">
-            Come back tomorrow!
+            Bis morgen!
           </p>
           <p className="text-sm text-gray-500">
-            You&apos;ve already answered today&apos;s question.
+            Sie haben die heutige Frage bereits beantwortet.
           </p>
         </div>
         <button
           onClick={handleGoHome}
           className="px-6 py-3 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors"
         >
-          Back to Home
+          Zurück zur Startseite
         </button>
       </main>
     );
@@ -129,17 +127,17 @@ export default function PlayPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-md mx-auto gap-6">
         <div className="bg-emerald-50 rounded-2xl p-6 text-center border border-emerald-200">
           <p className="text-lg font-semibold text-emerald-700 mb-1">
-            You&apos;re done!
+            Geschafft!
           </p>
           <p className="text-sm text-emerald-600">
-            Thanks for testing! You answered all 20 questions.
+            Danke fürs Testen! Sie haben alle 30 Fragen beantwortet.
           </p>
         </div>
         <button
           onClick={handleGoHome}
           className="px-6 py-3 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors"
         >
-          Back to Home
+          Zurück zur Startseite
         </button>
       </main>
     );
@@ -154,7 +152,6 @@ export default function PlayPage() {
       {phase === "result" && question && (
         <ResultView
           question={question}
-          chosenIdx={chosenIdx}
           correct={correct}
           onGoHome={handleGoHome}
         />
