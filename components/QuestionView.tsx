@@ -13,12 +13,14 @@ interface QuestionViewProps {
 
 export default function QuestionView({ question, onAnswer }: QuestionViewProps) {
   const [selected, setSelected] = useState<number | null>(null);
+  const [timeMs, setTimeMs] = useState<number>(0);
   const startTime = useRef(Date.now());
 
   const handleSelect = (idx: number) => {
     if (selected !== null) return;
+    const ms = Date.now() - startTime.current;
     setSelected(idx);
-    const timeMs = Date.now() - startTime.current;
+    setTimeMs(ms);
     const correct = idx === question.correct_idx;
 
     trackEvent("answer_submitted", {
@@ -27,13 +29,16 @@ export default function QuestionView({ question, onAnswer }: QuestionViewProps) 
       stage: question.stage,
       correct,
       chosen_idx: idx,
-      time_to_answer_ms: timeMs,
+      time_to_answer_ms: ms,
     });
-
-    setTimeout(() => {
-      onAnswer(idx, correct, timeMs);
-    }, 300);
   };
+
+  const handleContinue = () => {
+    if (selected === null) return;
+    onAnswer(selected, selected === question.correct_idx, timeMs);
+  };
+
+  const answered = selected !== null;
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-md mx-auto">
@@ -47,30 +52,42 @@ export default function QuestionView({ question, onAnswer }: QuestionViewProps) 
       </div>
 
       <div className="flex flex-col gap-3">
-        {question.options.map((option, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSelect(idx)}
-            className={cn(
-              "w-full text-left px-5 py-4 rounded-xl border-2 transition-all duration-200 font-medium",
-              selected === null &&
-                "border-gray-200 bg-white hover:border-[#1d3557] hover:bg-blue-50 active:scale-[0.98]",
-              selected === idx &&
-                idx === question.correct_idx &&
-                "border-emerald-500 bg-emerald-50 text-emerald-700",
-              selected === idx &&
-                idx !== question.correct_idx &&
-                "border-red-400 bg-red-50 text-red-700",
-              selected !== null &&
-                selected !== idx &&
-                "border-gray-100 bg-gray-50 text-gray-400"
-            )}
-            disabled={selected !== null}
-          >
-            {option}
-          </button>
-        ))}
+        {question.options.map((option, idx) => {
+          const isCorrectAnswer = idx === question.correct_idx;
+          const isWrongPick = answered && selected === idx && !isCorrectAnswer;
+          return (
+            <button
+              key={idx}
+              onClick={() => handleSelect(idx)}
+              className={cn(
+                "w-full text-left px-5 py-4 rounded-xl border-2 transition-all duration-200 font-medium",
+                !answered &&
+                  "border-gray-200 bg-white hover:border-[#1d3557] hover:bg-blue-50 active:scale-[0.98]",
+                answered &&
+                  isCorrectAnswer &&
+                  "border-emerald-500 bg-emerald-50 text-emerald-700",
+                isWrongPick && "border-red-400 bg-red-50 text-red-700",
+                answered &&
+                  !isCorrectAnswer &&
+                  !isWrongPick &&
+                  "border-gray-100 bg-gray-50 text-gray-400"
+              )}
+              disabled={answered}
+            >
+              {option}
+            </button>
+          );
+        })}
       </div>
+
+      {answered && (
+        <button
+          onClick={handleContinue}
+          className="w-full py-4 rounded-xl bg-[#1d3557] hover:bg-[#2a4a7a] text-white font-semibold text-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98] animate-in fade-in slide-in-from-bottom-2 duration-200"
+        >
+          Weiter
+        </button>
+      )}
     </div>
   );
 }
